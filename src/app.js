@@ -14,6 +14,7 @@ const autoclaveRoute = require("./routes/autoclaveModelRoute");
 const leadRoute = require("./routes/leadRoute");
 const washerRoute = require("./routes/washerModelRoute");
 const userRoute = require("./routes/userRoute");
+const authRoute = require("./routes/authRoute");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -28,5 +29,6 @@ app.use("/autoclaveModel", autoclaveRoute);
 app.use("/lead", leadRoute);
 app.use("/washerModel", washerRoute);
 app.use("/user", userRoute);
+app.use("/", authRoute);
 
 module.exports = app;
