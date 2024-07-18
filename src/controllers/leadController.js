@@ -1,4 +1,8 @@
 const Lead = require('../schemas/schemaLead');
+const { calculoVolumeTotalDiarioPorLead } = require('../utils/calculadora');
+const { autoclaveRecommendationByLead } = require('../utils/autoclaveCalc');
+const { washersRecommendationByLead } = require('../utils/washerCalc');
+
 
 const getLeads = async (_, res) => {
     try {
@@ -38,14 +42,42 @@ const createOneLead = async (req, res) => {
         if (existingLead) {
             return res.status(409).json({ message: 'O Cliente já obteve orçamento.' });
         }
-        //todo calc if calc ok create client in schema
+
         if (Object.keys(lead).length > 0) {
             const newLead = await Lead.create(lead);
-            res.status(201).json(newLead);
+            const newLeadId = newLead.id;
+            console.log(`Novo lead criado com ID: ${newLeadId}`);
+
+            // Execute os cálculos após criar o lead
+            const calculationResult = await calculoVolumeTotalDiarioPorLead(newLeadId);
+            console.log(`Resultado do cálculo para leadId ${newLeadId}:`, calculationResult);
+
+            const autoclaveRecommendations = await autoclaveRecommendationByLead(newLeadId);
+            console.log(`Recomendações de autoclave para leadId ${newLeadId}:`, autoclaveRecommendations);
+
+            const washerRecommendations = await washersRecommendationByLead(newLeadId);
+            console.log(`Recomendações de lavadora para leadId ${newLeadId}:`, washerRecommendations);
+
+            // Atualize o lead com os resultados dos cálculos
+            await Lead.update({
+                calculationResult,
+                autoclaveRecommendations,
+                washerRecommendations
+            }, {
+                where: { id: newLeadId }
+            });
+
+            res.status(201).json({
+                lead: newLead,
+                calculationResult,
+                autoclaveRecommendations,
+                washerRecommendations
+            });
         } else {
             res.status(406).json({ message: 'Ops, não foi possível adicionar esse cliente!' });
         }
     } catch (error) {
+        console.error(`Erro ao criar lead: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
 };

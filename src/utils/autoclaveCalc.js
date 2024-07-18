@@ -46,7 +46,7 @@ async function percentUtilizationAutoclave(id) {
             let tempoDisponivelDiarioMin = (24 * 60) - (tempoDiarioAquecimentoMaqMin + tempoTestDiarioBDMin)
             let numMaxCiclosDia = tempoDisponivelDiarioMin / tempoClicloCarDescMin
             let aproveitamentoCamaraPorcent = (volumeUtilCamaraLt / volumeTotCamaraLt) * 100
-            let numAutoclavesUmaEmManutencao = numAutoclaves - 1 
+            let numAutoclavesUmaEmManutencao = numAutoclaves - 1
 
             //entra na tabela de lead
             let intervaloDiarioPicoMin = (intervaloPicoCME * 60) -
@@ -214,45 +214,47 @@ async function getAllModelsAutoclaves() {
     }
 }
 
-async function autoclaveRecommendationByLead() {
+async function autoclaveRecommendationByLead(leadId) {
     try {
-        const ids = await getAllLeadIds(); //id de todos os leads
+        console.log(`Recebido leadId para recomendação de autoclaves: ${leadId}`);
+
         const marcas = await getAllBrandsAutoclaves();
         const modelos = await getAllModelsAutoclaves();
         const resultados = [];
 
-        for (const id of ids) { //calcula por lead percentResults e horasResults
-            const percentResults = await percentUtilizationAutoclave(id);
-            const horasResults = await horasTrabalhoAtenderVolTotal(id);
+        const percentResults = await percentUtilizationAutoclave(leadId);
+        const horasResults = await horasTrabalhoAtenderVolTotal(leadId);
+        console.log(`Resultados percentuais para leadId ${leadId}:`, percentResults);
+        console.log(`Resultados de horas para leadId ${leadId}:`, horasResults);
 
-            for (let i = 0; i < percentResults.length; i++) { //executa a contição enquanto houver valores no array percentual
-                const percentResult = percentResults[i];
-                const horasResult = horasResults[i];
+        for (let i = 0; i < percentResults.length; i++) {
+            const percentResult = percentResults[i];
+            const horasResult = horasResults[i];
 
-                if (percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent > 89 &&
-                    horasResult.horasTrabalhoAtenderVolTotalHr < 20) {
-                    const autoclaveId = percentResult.autoclaveId;
-                    const modeloAutoclave = modelos[autoclaveId];
-                    const marcaAutoclave = marcas[autoclaveId];
+            if (percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent >= 80 &&
+                percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent <= 90 &&
+                horasResult.horasTrabalhoAtenderVolTotalHr < 20) {
+                const autoclaveId = percentResult.autoclaveId;
+                const modeloAutoclave = modelos[autoclaveId];
+                const marcaAutoclave = marcas[autoclaveId];
 
-                    resultados.push({
-                        leadId: id,
-                        marcaId: marcaAutoclave,
-                        modeloId: modeloAutoclave,
-                        autoclaveId: percentResult.autoclaveId,
-                        percentUtilizationAutoclave: percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent,
-                        horasTrabalhoAtenderVolTotal: horasResult.horasTrabalhoAtenderVolTotalHr
-                    });
-                }
+                resultados.push({
+                    leadId: leadId,
+                    marcaId: marcaAutoclave,
+                    modeloId: modeloAutoclave,
+                    autoclaveId: percentResult.autoclaveId,
+                    percentUtilizationAutoclave: percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent,
+                    horasTrabalhoAtenderVolTotal: horasResult.horasTrabalhoAtenderVolTotalHr
+                });
             }
         }
 
         const recomendacoes = resultados.slice(0, 3);
 
-        console.log("Resultados:", recomendacoes);
+        console.log(`Recomendações para leadId ${leadId}:`, recomendacoes);
         return recomendacoes;
     } catch (err) {
-        console.error("Erro ao calcular as recomendações:", err);
+        console.error(`Erro ao calcular as recomendações para leadId ${leadId}:`, err);
         throw err;
     }
 }

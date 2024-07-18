@@ -57,7 +57,7 @@ const Lead = sequelize.define('lead', {
         type: DataTypes.STRING(45),
         allowNull: false
     },
-    numeroSalasCirurgicas: { 
+    numeroSalasCirurgicas: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
@@ -256,6 +256,18 @@ const Lead = sequelize.define('lead', {
         type: DataTypes.FLOAT,
         allowNull: true,
         defaultValue: 0.0
+    },
+    calculationResult: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    autoclaveRecommendations: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    washerRecommendations: {
+        type: DataTypes.JSON,
+        allowNull: true
     },
 }, {
     tableName: 'lead',

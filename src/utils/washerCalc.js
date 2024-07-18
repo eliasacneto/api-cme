@@ -11,7 +11,7 @@ async function percentUtilizationWasher(id) {
         const queryLead = `SELECT 
               numeroLeitoUTI,
               estimativaVolumeTotalDiárioMaterial,
-              numCirurgiasDia
+              numeroCirurgiaSalaDia
           FROM \`lead\` WHERE id = ?`;
         const [resultsLead] = await connection.query(queryLead, [id]);
 
@@ -19,7 +19,7 @@ async function percentUtilizationWasher(id) {
             return null;
         }
 
-        const { numeroLeitoUTI, estimativaVolumeTotalDiárioMaterial, numCirurgiasDia } = resultsLead[0];
+        const { numeroLeitoUTI, estimativaVolumeTotalDiárioMaterial, numeroCirurgiaSalaDia } = resultsLead[0];
 
         //consulta lavadoras
         const queryWashers = `SELECT * FROM \`lavadora\``;
@@ -57,18 +57,18 @@ async function percentUtilizationWasher(id) {
             let tempProcessamDemandaInstrumentosMin = numCiclosInstrumentosDia *
                 (tempMedCicloInstrumentosCargaMaxMin + intervaloMedEntreCiclos)
 
-            let qtdTraqueiasDia = numCirurgiasDia * qtdTraqueiasCirurgia 
-            let qtdTraqueiasUtiDia = numeroLeitoUTI * qtdTraqueiasLeitoUtiDia  
-            let qtdTotTraqueiasDia = qtdTraqueiasDia + qtdTraqueiasUtiDia 
-            let qtdCiclosAssistVentDia = qtdTotTraqueiasDia / capacidadeCargaTraqueias 
-            let demandaCiclosDia = qtdCiclosAssistVentDia + numCiclosInstrumentosDia  
+            let qtdTraqueiasDia = numeroCirurgiaSalaDia * qtdTraqueiasCirurgia
+            let qtdTraqueiasUtiDia = numeroLeitoUTI * qtdTraqueiasLeitoUtiDia
+            let qtdTotTraqueiasDia = qtdTraqueiasDia + qtdTraqueiasUtiDia
+            let qtdCiclosAssistVentDia = qtdTotTraqueiasDia / capacidadeCargaTraqueias
+            let demandaCiclosDia = qtdCiclosAssistVentDia + numCiclosInstrumentosDia
             let tempProcessamDemandaAssistVentMin = qtdCiclosAssistVentDia *
                 (tempMedCicloAssisVentCargaMaxMin +
-                    intervaloMedEntreCiclos) 
+                    intervaloMedEntreCiclos)
 
             let demandaTempoDiaMin = tempProcessamDemandaInstrumentosMin +
-                tempProcessamDemandaAssistVentMin 
-            let minutosDisponiveisTodosEquipamDia = 60 * 24 * quantidadeTermosProjeto 
+                tempProcessamDemandaAssistVentMin
+            let minutosDisponiveisTodosEquipamDia = 60 * 24 * quantidadeTermosProjeto
             let percentualUtilizacaoCapacidadeMax = Math.round(((demandaTempoDiaMin /
                 minutosDisponiveisTodosEquipamDia) * 100) * 100) / 100
 
@@ -161,45 +161,45 @@ async function getAllModelsWashers() {
     }
 }
 
-async function washersRecommendationByLead() {
+async function washersRecommendationByLead(leadId) {
     try {
-        const ids = await getAllLeadIds(); //id de todos os leads
+        console.log(`Recebido leadId para recomendação de lavadoras: ${leadId}`);
+
         const marcas = await getAllBrandsWashers();
         const modelos = await getAllModelsWashers();
         const resultados = [];
 
-        for (const id of ids) { //calcula por lead percentResults
-            const percentResults = await percentUtilizationWasher(id);
+        const percentResults = await percentUtilizationWasher(leadId);
+        console.log(`Resultados percentuais para leadId ${leadId}:`, percentResults);
 
-            for (let i = 0; i < percentResults.length; i++) { //executa a contição enquanto houver valores no array percentual
-                const percentResult = percentResults[i];
+        for (let i = 0; i < percentResults.length; i++) {
+            const percentResult = percentResults[i];
 
-                if (percentResult.percentualUtilizacaoCapacidadeMax > 89) {
-                    const washerId = percentResult.washerId;
-                    const modeloLavadora = modelos[washerId];
-                    const marcaLavadora = marcas[washerId];
+            if (percentResult.percentualUtilizacaoCapacidadeMax <= 90) {
+                const washerId = percentResult.washerId;
+                const modeloLavadora = modelos[washerId];
+                const marcaLavadora = marcas[washerId];
 
-                    const percentResults = await percentUtilizationWasher(id);
-                    resultados.push({
-                        leadId: id,
-                        marcaId: marcaLavadora,
-                        modeloId: modeloLavadora,
-                        washerId: percentResult.washerId,
-                        percentUtilizationWasher: percentResult.percentualUtilizacaoCapacidadeMax
-                    });
-                }
+                resultados.push({
+                    leadId: leadId,
+                    marcaId: marcaLavadora,
+                    modeloId: modeloLavadora,
+                    washerId: percentResult.washerId,
+                    percentUtilizationWasher: percentResult.percentualUtilizacaoCapacidadeMax
+                });
             }
         }
 
         const recomendacoes = resultados.slice(0, 2);
 
-        console.log("Recomendações:", recomendacoes);
+        console.log(`Recomendações para leadId ${leadId}:`, recomendacoes);
         return recomendacoes;
     } catch (err) {
-        console.error("Erro ao calcular as recomendações:", err);
+        console.error(`Erro ao calcular as recomendações para leadId ${leadId}:`, err);
         throw err;
     }
 }
+
 
 /*async function visualizarResultados() {
     try {
