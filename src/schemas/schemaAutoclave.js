@@ -65,7 +65,7 @@ const Autoclave = sequelize.define('autoclave', {
         allowNull: true,
         defaultValue: 0.0
     },
-    numAutoclaves: { 
+    numAutoclaves: {
         type: DataTypes.INTEGER,
         allowNull: true,
         defaultValue: 0
@@ -86,7 +86,8 @@ const Autoclave = sequelize.define('autoclave', {
     timestamps: true,
 });
 
-AutoclaveBrand.hasMany(Autoclave, { foreignKey: 'marcaAutoclave' });
+AutoclaveBrand.hasMany(Autoclave, { foreignKey: 'marcaAutoclave' }); // Definindo 'as' para o alias
+
 Autoclave.belongsTo(AutoclaveBrand, { foreignKey: 'marcaAutoclave', as: 'brand' });
 
 Autoclave.sync();

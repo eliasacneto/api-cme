@@ -1,6 +1,8 @@
 require("dotenv").config();
 const conn = require("../database/conn");
 const { getAllLeadIds } = require('./calculadora');
+const Autoclave = require('../schemas/schemaAutoclave');
+const AutoclaveBrand = require('../schemas/schemaAutoclaveBrand');
 
 async function percentUtilizationAutoclave(id) {
     let connection;
@@ -197,54 +199,87 @@ async function getAllBrandsAutoclaves() {
     }
 }
 
+// async function getAllModelsAutoclaves() {
+//     let connection;
+//     try {
+//         connection = await conn();
+//         const query = `SELECT modeloAutoclave FROM \`autoclave\``;
+//         const [results] = await connection.query(query);
+//         return results.map((row) => row.modeloAutoclave);
+//     } catch (err) {
+//         console.error("Erro ao obter os modelos:", err);
+//         throw err;
+//     } finally {
+//         if (connection) {
+//             await connection.end();
+//         }
+//     }
+// }
+
 async function getAllModelsAutoclaves() {
-    let connection;
     try {
-        connection = await conn();
-        const query = `SELECT modeloAutoclave FROM \`autoclave\``;
-        const [results] = await connection.query(query);
-        return results.map((row) => row.modeloAutoclave);
+        const autoclaves = await Autoclave.findAll({
+            attributes: ['id', 'modeloAutoclave']
+        });
+
+        return autoclaves.map((autoclave) => ({
+            autoclaveId: autoclave.id,
+            modeloAutoclave: autoclave.modeloAutoclave
+        }));
     } catch (err) {
-        console.error("Erro ao obter os modelos:", err);
+        console.error("Erro ao obter os modelos das autoclaves:", err);
         throw err;
-    } finally {
-        if (connection) {
-            await connection.end();
-        }
     }
 }
 
 async function getAllPricesAutoclaves() {
-    let connection;
     try {
-        connection = await conn();
-        const query = `SELECT preco FROM \`autoclave\``;
-        const [results] = await connection.query(query);
-        return results.map((row) => row.preco);
+        const autoclaves = await Autoclave.findAll({
+            attributes: ['id', 'preco']
+        });
+
+        return autoclaves.map((autoclave) => ({
+            autoclaveId: autoclave.id,
+            preco: autoclave.preco
+        }));
     } catch (err) {
-        console.error("Erro ao obter os preços:", err);
+        console.error("Erro ao obter os preços das autoclaves:", err);
         throw err;
-    } finally {
-        if (connection) {
-            await connection.end();
-        }
     }
 }
 
+async function getBrandNameById(autoclaveId) {
+    try {
+        const autoclave = await Autoclave.findByPk(autoclaveId, {
+            include: {
+                model: AutoclaveBrand,
+                as: 'brand'
+            }
+        });
+
+        if (!autoclave) {
+            console.error(`Autoclave com id ${autoclaveId} não encontrada.`);
+            return null;
+        }
+
+
+        return autoclave.brand ? autoclave.brand.nomeMarca : null;
+    } catch (err) {
+        console.error("Erro ao obter o nome da marca da autoclave:", err);
+        throw err;
+    }
+}
 
 async function autoclaveRecommendationByLead(leadId) {
     try {
         console.log(`Recebido leadId para recomendação de autoclaves: ${leadId}`);
 
-        const marcas = await getAllBrandsAutoclaves();
-        const modelos = await getAllModelsAutoclaves();
-        const precos = await getAllPricesAutoclaves();
-        const resultados = [];
-
         const percentResults = await percentUtilizationAutoclave(leadId);
         const horasResults = await horasTrabalhoAtenderVolTotal(leadId);
         console.log(`Resultados percentuais para leadId ${leadId}:`, percentResults);
         console.log(`Resultados de horas para leadId ${leadId}:`, horasResults);
+
+        const resultados = [];
 
         for (let i = 0; i < percentResults.length; i++) {
             const percentResult = percentResults[i];
@@ -254,15 +289,25 @@ async function autoclaveRecommendationByLead(leadId) {
                 percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent <= 90 &&
                 horasResult.horasTrabalhoAtenderVolTotalHr < 20) {
                 const autoclaveId = percentResult.autoclaveId;
-                const modeloAutoclave = modelos[autoclaveId];
-                const marcaAutoclave = marcas[autoclaveId];
-                const preco = precos[autoclaveId]
+
+
+                const marcaNomeAutoclave = await getBrandNameById(autoclaveId);
+
+
+                const preco = await getAllPricesAutoclaves()
+                    .then(prices => prices.find(item => item.autoclaveId === autoclaveId)?.preco);
+
+
+                const modeloAutoclave = await getAllModelsAutoclaves()
+                    .then(models => models.find(item => item.autoclaveId === autoclaveId)?.modeloAutoclave);
 
                 resultados.push({
                     leadId: leadId,
-                    marcaId: marcaAutoclave,
-                    modeloId: modeloAutoclave,
-                    autoclaveId: percentResult.autoclaveId,
+                    marcaId: autoclaveId,
+                    nomeMarca: marcaNomeAutoclave,
+                    modeloId: autoclaveId,
+                    modeloAutoclave: modeloAutoclave || '',
+                    autoclaveId: autoclaveId,
                     percentUtilizationAutoclave: percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent,
                     horasTrabalhoAtenderVolTotal: horasResult.horasTrabalhoAtenderVolTotalHr,
                     preco: preco
@@ -279,7 +324,6 @@ async function autoclaveRecommendationByLead(leadId) {
         throw err;
     }
 }
-
 /*async function visualizarResultados() {
     try {
         const ids = await getAllLeadIds();
