@@ -33,3 +33,29 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Error logging in", error });
   }
 };
+exports.resetPassword = async (req, res) => {
+  const { userEmail, token, newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, "resetPasswordKey");
+
+    if (decoded.userEmail !== userEmail) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    const user = await User.findOne({ where: { userEmail } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.userPassword = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Error resetting password", error });
+  }
+};
