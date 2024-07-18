@@ -31,7 +31,7 @@ const getOneLead = async (req, res) => {
 const createOneLead = async (req, res) => {
     try {
         const lead = req.body;
-        const { hospitalEmail } = lead;
+        const { hospitalEmail, processaTecido } = lead;
 
         if (!hospitalEmail) {
             return res.status(400).json({ message: 'Email do hospital não fornecido.' });
@@ -55,8 +55,13 @@ const createOneLead = async (req, res) => {
             const autoclaveRecommendations = await autoclaveRecommendationByLead(newLeadId);
             console.log(`Recomendações de autoclave para leadId ${newLeadId}:`, autoclaveRecommendations);
 
-            const washerRecommendations = await washersRecommendationByLead(newLeadId);
-            console.log(`Recomendações de lavadora para leadId ${newLeadId}:`, washerRecommendations);
+            let washerRecommendations;
+            if (processaTecido == '0') {
+                washerRecommendations = await washersRecommendationByLead(newLeadId);
+                console.log(`Recomendações de lavadora para leadId ${newLeadId}:`, washerRecommendations);
+            } else {
+                washerRecommendations = 'Não se aplica';
+            }
 
             // Atualize o lead com os resultados dos cálculos
             await Lead.update({
