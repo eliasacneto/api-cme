@@ -161,12 +161,30 @@ async function getAllModelsWashers() {
     }
 }
 
+async function getAllPricesWashers() {
+    let connection;
+    try {
+        connection = await conn();
+        const query = `SELECT preco FROM \`lavadora\``;
+        const [results] = await connection.query(query);
+        return results.map((row) => row.preco);
+    } catch (err) {
+        console.error("Erro ao obter os preços:", err);
+        throw err;
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+}
+
 async function washersRecommendationByLead(leadId) {
     try {
         console.log(`Recebido leadId para recomendação de lavadoras: ${leadId}`);
 
         const marcas = await getAllBrandsWashers();
         const modelos = await getAllModelsWashers();
+        const precos = await getAllPricesWashers();
         const resultados = [];
 
         const percentResults = await percentUtilizationWasher(leadId);
@@ -179,13 +197,15 @@ async function washersRecommendationByLead(leadId) {
                 const washerId = percentResult.washerId;
                 const modeloLavadora = modelos[washerId];
                 const marcaLavadora = marcas[washerId];
+                const preco = precos[washerId]
 
                 resultados.push({
                     leadId: leadId,
                     marcaId: marcaLavadora,
                     modeloId: modeloLavadora,
                     washerId: percentResult.washerId,
-                    percentUtilizationWasher: percentResult.percentualUtilizacaoCapacidadeMax
+                    percentUtilizationWasher: percentResult.percentualUtilizacaoCapacidadeMax,
+                    preco: preco
                 });
             }
         }

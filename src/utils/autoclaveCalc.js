@@ -38,7 +38,7 @@ async function percentUtilizationAutoclave(id) {
                 tempoDiarioAquecimentoMaqMin,
                 numAutoclaves,
                 volumeUtilCamaraLt,
-                volumeTotCamaraLt
+                volumeTotCamaraLt, preco
             } = autoclave;
 
             //entra na tabela de autoclave
@@ -214,12 +214,31 @@ async function getAllModelsAutoclaves() {
     }
 }
 
+async function getAllPricesAutoclaves() {
+    let connection;
+    try {
+        connection = await conn();
+        const query = `SELECT preco FROM \`autoclave\``;
+        const [results] = await connection.query(query);
+        return results.map((row) => row.preco);
+    } catch (err) {
+        console.error("Erro ao obter os preços:", err);
+        throw err;
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+}
+
+
 async function autoclaveRecommendationByLead(leadId) {
     try {
         console.log(`Recebido leadId para recomendação de autoclaves: ${leadId}`);
 
         const marcas = await getAllBrandsAutoclaves();
         const modelos = await getAllModelsAutoclaves();
+        const precos = await getAllPricesAutoclaves();
         const resultados = [];
 
         const percentResults = await percentUtilizationAutoclave(leadId);
@@ -237,6 +256,7 @@ async function autoclaveRecommendationByLead(leadId) {
                 const autoclaveId = percentResult.autoclaveId;
                 const modeloAutoclave = modelos[autoclaveId];
                 const marcaAutoclave = marcas[autoclaveId];
+                const preco = precos[autoclaveId]
 
                 resultados.push({
                     leadId: leadId,
@@ -244,7 +264,8 @@ async function autoclaveRecommendationByLead(leadId) {
                     modeloId: modeloAutoclave,
                     autoclaveId: percentResult.autoclaveId,
                     percentUtilizationAutoclave: percentResult.capUtilizTodasAutoclavesIntervaloPicoPorcent,
-                    horasTrabalhoAtenderVolTotal: horasResult.horasTrabalhoAtenderVolTotalHr
+                    horasTrabalhoAtenderVolTotal: horasResult.horasTrabalhoAtenderVolTotalHr,
+                    preco: preco
                 });
             }
         }
