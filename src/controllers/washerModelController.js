@@ -1,5 +1,6 @@
 
 const Washer = require('../schemas/schemaWasher');
+const WasherBrand = require('../schemas/schemaWasherBrand');
 
 const getWasherModels = async (req, res) => {
     try {
@@ -23,6 +24,21 @@ const getOneWasherModel = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+const getWasherModelsByBrand = async (req, res) => {
+    try {
+        const brandsWithWashers = await WasherBrand.findAll({
+            include: {
+                model: Washer,
+                attributes: ['id', 'modeloLavadora']
+            }
+        });
+        res.status(200).json(brandsWithWashers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 const createOneWasherModel = async (req, res) => {
     const {
@@ -155,4 +171,4 @@ const deleteOneWasherModel = async (req, res) => {
     }
 }
 
-module.exports = { getWasherModels, getOneWasherModel, createOneWasherModel, updateOneWasherModel, deleteOneWasherModel };
+module.exports = { getWasherModels, getOneWasherModel, getWasherModelsByBrand, createOneWasherModel, updateOneWasherModel, deleteOneWasherModel };

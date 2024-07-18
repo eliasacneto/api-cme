@@ -2,6 +2,8 @@
 require("dotenv").config();
 const conn = require("../database/conn");
 const { getAllLeadIds } = require('./calculadora');
+const Washer = require('../schemas/schemaWasher');
+const WasherBrand = require('../schemas/schemaWasherBrand');
 
 async function percentUtilizationWasher(id) {
     let connection;
@@ -144,37 +146,94 @@ async function getAllBrandsWashers() {
     }
 }
 
+// async function getAllModelsWashers() {
+//     let connection;
+//     try {
+//         connection = await conn();
+//         const query = `SELECT modeloLavadora FROM \`lavadora\``;
+//         const [results] = await connection.query(query);
+//         return results.map((row) => row.modeloLavadora);
+//     } catch (err) {
+//         console.error("Erro ao obter os modelos:", err);
+//         throw err;
+//     } finally {
+//         if (connection) {
+//             await connection.end();
+//         }
+//     }
+// }
+
+
 async function getAllModelsWashers() {
-    let connection;
     try {
-        connection = await conn();
-        const query = `SELECT modeloLavadora FROM \`lavadora\``;
-        const [results] = await connection.query(query);
-        return results.map((row) => row.modeloLavadora);
+        const washers = await Washer.findAll({
+            attributes: ['id', 'modeloLavadora']
+        });
+
+        return washers.map((washer) => ({
+            washerId: washer.id,
+            modeloLavadora: washer.modeloLavadora
+        }));
     } catch (err) {
-        console.error("Erro ao obter os modelos:", err);
+        console.error("Erro ao obter os modelos das lavadoras:", err);
         throw err;
-    } finally {
-        if (connection) {
-            await connection.end();
-        }
     }
 }
 
 async function getAllPricesWashers() {
-    let connection;
     try {
-        connection = await conn();
-        const query = `SELECT preco FROM \`lavadora\``;
-        const [results] = await connection.query(query);
-        return results.map((row) => row.preco);
+        const washers = await Washer.findAll({
+            attributes: ['id', 'preco']
+        });
+
+        return washers.map((washers) => ({
+            washerId: washers.id,
+            preco: washers.preco
+        }));
     } catch (err) {
-        console.error("Erro ao obter os preços:", err);
+        console.error("Erro ao obter os preços das lavadoras:", err);
         throw err;
-    } finally {
-        if (connection) {
-            await connection.end();
+    }
+}
+
+
+
+// async function getAllPricesWashers() {
+//     let connection;
+//     try {
+//         connection = await conn();
+//         const query = `SELECT preco FROM \`lavadora\``;
+//         const [results] = await connection.query(query);
+//         return results.map((row) => row.preco);
+//     } catch (err) {
+//         console.error("Erro ao obter os preços:", err);
+//         throw err;
+//     } finally {
+//         if (connection) {
+//             await connection.end();
+//         }
+//     }
+// }
+
+async function getBrandNameById(washerId) {
+    try {
+        const washer = await Washer.findByPk(washerId, {
+            include: {
+                model: WasherBrand,
+                as: 'brand'
+            }
+        });
+
+        if (!washer) {
+            console.error(`Lavadora com id ${washerId} não encontrada.`);
+            return null;
         }
+
+
+        return washer.brand ? washer.brand.nomeMarca : null;
+    } catch (err) {
+        console.error("Erro ao obter o nome da marca da lavadora:", err);
+        throw err;
     }
 }
 
@@ -182,28 +241,35 @@ async function washersRecommendationByLead(leadId) {
     try {
         console.log(`Recebido leadId para recomendação de lavadoras: ${leadId}`);
 
-        const marcas = await getAllBrandsWashers();
-        const modelos = await getAllModelsWashers();
-        const precos = await getAllPricesWashers();
-        const resultados = [];
-
         const percentResults = await percentUtilizationWasher(leadId);
         console.log(`Resultados percentuais para leadId ${leadId}:`, percentResults);
+
+        const resultados = [];
 
         for (let i = 0; i < percentResults.length; i++) {
             const percentResult = percentResults[i];
 
             if (percentResult.percentualUtilizacaoCapacidadeMax <= 90) {
                 const washerId = percentResult.washerId;
-                const modeloLavadora = modelos[washerId];
-                const marcaLavadora = marcas[washerId];
-                const preco = precos[washerId]
+
+
+                const marcaNomeLavadora = await getBrandNameById(washerId);
+
+
+                const preco = await getAllPricesWashers()
+                    .then(prices => prices.find(item => item.washerId === washerId)?.preco);
+
+
+                const modeloLavadora = await getAllModelsWashers()
+                    .then(models => models.find(item => item.washerId === washerId)?.modeloLavadora);
 
                 resultados.push({
                     leadId: leadId,
-                    marcaId: marcaLavadora,
-                    modeloId: modeloLavadora,
-                    washerId: percentResult.washerId,
+                    marcaId: washerId,
+                    nomeMarca: marcaNomeLavadora,
+                    modeloId: washerId,
+                    modeloLavadora: modeloLavadora || '',
+                    washerId: washerId,
                     percentUtilizationWasher: percentResult.percentualUtilizacaoCapacidadeMax,
                     preco: preco
                 });
@@ -219,6 +285,48 @@ async function washersRecommendationByLead(leadId) {
         throw err;
     }
 }
+
+// async function washersRecommendationByLead(leadId) {
+//     try {
+//         console.log(`Recebido leadId para recomendação de lavadoras: ${leadId}`);
+
+//         const marcas = await getAllBrandsWashers();
+//         const modelos = await getAllModelsWashers();
+//         const precos = await getAllPricesWashers();
+//         const resultados = [];
+
+//         const percentResults = await percentUtilizationWasher(leadId);
+//         console.log(`Resultados percentuais para leadId ${leadId}:`, percentResults);
+
+//         for (let i = 0; i < percentResults.length; i++) {
+//             const percentResult = percentResults[i];
+
+//             if (percentResult.percentualUtilizacaoCapacidadeMax <= 90) {
+//                 const washerId = percentResult.washerId;
+//                 const modeloLavadora = modelos[washerId];
+//                 const marcaLavadora = marcas[washerId];
+//                 const preco = precos[washerId]
+
+//                 resultados.push({
+//                     leadId: leadId,
+//                     marcaId: marcaLavadora,
+//                     modeloId: modeloLavadora,
+//                     washerId: percentResult.washerId,
+//                     percentUtilizationWasher: percentResult.percentualUtilizacaoCapacidadeMax,
+//                     preco: preco
+//                 });
+//             }
+//         }
+
+//         const recomendacoes = resultados.slice(0, 2);
+
+//         console.log(`Recomendações para leadId ${leadId}:`, recomendacoes);
+//         return recomendacoes;
+//     } catch (err) {
+//         console.error(`Erro ao calcular as recomendações para leadId ${leadId}:`, err);
+//         throw err;
+//     }
+// }
 
 
 /*async function visualizarResultados() {

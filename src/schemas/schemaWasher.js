@@ -62,8 +62,8 @@ const Washer = sequelize.define('lavadora', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    quantidadeTermosProjeto: { 
-        type: DataTypes.INTEGER, 
+    quantidadeTermosProjeto: {
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     preco: {
@@ -75,6 +75,10 @@ const Washer = sequelize.define('lavadora', {
     tableName: 'lavadora',
     timestamps: true,
 });
+
+WasherBrand.hasMany(Washer, { foreignKey: 'marcaLavadora' }); // Definindo 'as' para o alias
+
+Washer.belongsTo(WasherBrand, { foreignKey: 'marcaLavadora', as: 'brand' });
 
 Washer.sync();
 
