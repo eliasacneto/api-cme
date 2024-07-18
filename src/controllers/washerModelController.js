@@ -129,9 +129,9 @@ const updateOneWasherModel = async (req, res) => {
         }
 
         const modelWasher = req.body;
-        const { modeloWasher } = modelWasher;
+        const { modeloLavadora } = modelWasher;
 
-        const existingModel = await Washer.findOne({ where: { modeloWasher } });
+        const existingModel = await Washer.findOne({ where: { modeloLavadora } });
 
         if (existingModel && existingModel.id !== parseInt(id)) {
             return res.status(409).json({ message: 'Modelo já cadastrado no banco de dados.' });
