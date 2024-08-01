@@ -47,22 +47,18 @@ const createOneAutoclaveModel = async (req, res) => {
         volumeUtilCamaraLt,
         medTotTempoCicloATMin,
         tempoCargaDescargaMin,
-        tempoClicloCarDescMin,
         tempoTestDiarioBDMin,
         tempoDiarioAquecimentoMaqMin,
-        tempoDisponivelDiarioMin,
-        producaoHospitalVolDiarioMaterialLt,
         volumeProcessadoIntervaloPicoLt90totDiario,
         intervaloDiarioPicoMin,
-        numMaxCiclosDia,
         numMaxCiclosIntervaloPico,
-        aproveitamentoCamaraPorcent,
-        numAutoclaves,
+        preco,
+        numAutoclaves, //
+        tempoClicloCarDescMin,
         numAutoclavesUmaEmManutencao,
-        capProcessamIntervaloPicoTodasAutoclavesOnLt,
-        horasTrabalhoAtenderVolTotalHr,
-        capUtilizTodasAutoclavesIntervaloPicoPorcent,
-        preco
+        tempoDisponivelDiarioMin,
+        numMaxCiclosDia,
+        aproveitamentoCamaraPorcent        
     } = req.body;
 
     if (!modeloAutoclave) {
@@ -83,22 +79,18 @@ const createOneAutoclaveModel = async (req, res) => {
             volumeUtilCamaraLt,
             medTotTempoCicloATMin,
             tempoCargaDescargaMin,
-            tempoClicloCarDescMin,
             tempoTestDiarioBDMin,
             tempoDiarioAquecimentoMaqMin,
-            tempoDisponivelDiarioMin,
-            producaoHospitalVolDiarioMaterialLt,
             volumeProcessadoIntervaloPicoLt90totDiario,
             intervaloDiarioPicoMin,
-            numMaxCiclosDia,
             numMaxCiclosIntervaloPico,
-            aproveitamentoCamaraPorcent,
+            preco,
             numAutoclaves,
+            tempoClicloCarDescMin,
             numAutoclavesUmaEmManutencao,
-            capProcessamIntervaloPicoTodasAutoclavesOnLt,
-            horasTrabalhoAtenderVolTotalHr,
-            capUtilizTodasAutoclavesIntervaloPicoPorcent,
-            preco
+            tempoDisponivelDiarioMin,
+            numMaxCiclosDia,
+            aproveitamentoCamaraPorcent
         });
         res.status(201).send(newAutoclaveModel);
     } catch (error) {

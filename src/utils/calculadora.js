@@ -18,7 +18,7 @@ async function getAllLeadIds() {
     }
 }
 
-async function calculoVolumeTotalDiarioPorLead(id) {
+async function calculoVolumeTotalDiario(id) {
     let connection;
     try {
         connection = await conn();
@@ -73,15 +73,15 @@ async function calculoVolumeTotalDiarioPorLead(id) {
             estimativaVolumeTotalDiárioMaterial * UE;
         let processaTecido = row.processaTecido;
 
-        console.log('\nvolumeTotalDiarioCirurgias:', volumeTotalDiarioCirurgias)
-        console.log('volumeTotalDiarioUTIs:', volumeTotalDiarioUTIs)
+        //console.log('\nvolumeTotalDiarioCirurgias:', volumeTotalDiarioCirurgias)
+        //console.log('volumeTotalDiarioUTIs:', volumeTotalDiarioUTIs)
 
         const arredondar = (valor, fator) => Math.ceil(valor * fator) / fator;
         volumeTotalDiarioInternacao = arredondar(volumeTotalDiarioInternacao, 10);
-        console.log('volumeTotalDiarioInternacao:', volumeTotalDiarioInternacao)
+        //console.log('volumeTotalDiarioInternacao:', volumeTotalDiarioInternacao)
 
-        //função para update do lead no banco
-        async function updatedQuery(
+        //função para insert do lead no banco
+        async function insertQuery(
             numCirurgiasDia,
             volumeTotalDiarioCirurgias,
             volumeTotalDiarioUTIs,
@@ -89,19 +89,11 @@ async function calculoVolumeTotalDiarioPorLead(id) {
             estimativaVolumeTotalDiárioMaterial,
             estimativaVolumeTotalDiarioInstrumentalUE,
             estimativaVolumeTotalDiarioInstrumentalLt,
-            id
+            id,
+            leadProject 
         ) {
-            const updateQuery = `UPDATE \`lead\` SET 
-        numCirurgiasDia = ?, 
-        volumeTotalDiarioCirurgias = ?, 
-        volumeTotalDiarioUTIs = ?, 
-        volumeTotalDiarioInternacao = ?, 
-        estimativaVolumeTotalDiárioMaterial = ?, 
-        estimativaVolumeTotalDiarioInstrumentalUE = ?, 
-        estimativaVolumeTotalDiarioInstrumentalLt = ? 
-        WHERE id = ?`;
-
-            await connection.query(updateQuery, [
+            const insertQuery = `INSERT INTO \`calculo_projeto\` (
+                id,
                 numCirurgiasDia,
                 volumeTotalDiarioCirurgias,
                 volumeTotalDiarioUTIs,
@@ -109,9 +101,30 @@ async function calculoVolumeTotalDiarioPorLead(id) {
                 estimativaVolumeTotalDiárioMaterial,
                 estimativaVolumeTotalDiarioInstrumentalUE,
                 estimativaVolumeTotalDiarioInstrumentalLt,
-                id
+                lead_project
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            ON DUPLICATE KEY UPDATE
+                numCirurgiasDia = VALUES(numCirurgiasDia),
+                volumeTotalDiarioCirurgias = VALUES(volumeTotalDiarioCirurgias),
+                volumeTotalDiarioUTIs = VALUES(volumeTotalDiarioUTIs),
+                volumeTotalDiarioInternacao = VALUES(volumeTotalDiarioInternacao),
+                estimativaVolumeTotalDiárioMaterial = VALUES(estimativaVolumeTotalDiárioMaterial),
+                estimativaVolumeTotalDiarioInstrumentalUE = VALUES(estimativaVolumeTotalDiarioInstrumentalUE),
+                estimativaVolumeTotalDiarioInstrumentalLt = VALUES(estimativaVolumeTotalDiarioInstrumentalLt)`;
+        
+            await connection.query(insertQuery, [
+                id,
+                numCirurgiasDia,
+                volumeTotalDiarioCirurgias,
+                volumeTotalDiarioUTIs,
+                volumeTotalDiarioInternacao,
+                estimativaVolumeTotalDiárioMaterial,
+                estimativaVolumeTotalDiarioInstrumentalUE,
+                estimativaVolumeTotalDiarioInstrumentalLt,
+                id 
             ]);
         }
+        
 
         if (processaTecido == 0) {
             console.log("\n0 true = ✅ Ele processa tecidos");
@@ -122,7 +135,7 @@ async function calculoVolumeTotalDiarioPorLead(id) {
             console.log('estimativaVolumeTotalDiarioInstrumentalUE:', estimativaVolumeTotalDiarioInstrumentalUE)
             console.log('estimativaVolumeTotalDiarioInstrumentalLt:', estimativaVolumeTotalDiarioInstrumentalLt)
 
-            await updatedQuery(
+            await insertQuery(
                 numCirurgiasDia,
                 volumeTotalDiarioCirurgias,
                 volumeTotalDiarioUTIs,
@@ -130,6 +143,7 @@ async function calculoVolumeTotalDiarioPorLead(id) {
                 estimativaVolumeTotalDiárioMaterial,
                 estimativaVolumeTotalDiarioInstrumentalUE,
                 estimativaVolumeTotalDiarioInstrumentalLt,
+                id,
                 id
             );
 
@@ -143,7 +157,7 @@ async function calculoVolumeTotalDiarioPorLead(id) {
             console.log('estimativaVolumeTotalDiarioInstrumentalUE:', estimativaVolumeTotalDiarioInstrumentalUE)
             console.log('estimativaVolumeTotalDiarioInstrumentalLt:', estimativaVolumeTotalDiarioInstrumentalLt)
 
-            await updatedQuery(
+            await insertQuery(
                 numCirurgiasDia,
                 volumeTotalDiarioCirurgias,
                 volumeTotalDiarioUTIs,
@@ -151,7 +165,8 @@ async function calculoVolumeTotalDiarioPorLead(id) {
                 estimativaVolumeTotalDiárioMaterial,
                 estimativaVolumeTotalDiarioInstrumentalUE,
                 estimativaVolumeTotalDiarioInstrumentalLt,
-                id
+                id,
+                id 
             );
 
             return estimativaVolumeTotalDiarioInstrumentalLt;
@@ -166,13 +181,13 @@ async function calculoVolumeTotalDiarioPorLead(id) {
     }
 }
 
-/*async function visualizarResultados() {
+async function visualizarResultados() {
     try {
         const ids = await getAllLeadIds();
         const resultados = [];
 
         for (const id of ids) {
-            const resultado = await calculoVolumeTotalDiarioPorLead(id);
+            const resultado = await calculoVolumeTotalDiario(id);
             resultados.push(resultado);
         }
         console.log("Resultados:", resultados);
@@ -180,9 +195,9 @@ async function calculoVolumeTotalDiarioPorLead(id) {
         console.error("Erro ao calcular o volume total diário por lead:", err);
     }
 }
-visualizarResultados();*/
+visualizarResultados();
 
 module.exports = {
     getAllLeadIds,
-    calculoVolumeTotalDiarioPorLead
+    calculoVolumeTotalDiario
 };

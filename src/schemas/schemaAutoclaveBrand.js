@@ -1,22 +1,20 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database/sequelize');
 
-const AutoclaveBrand = sequelize.define('marcaAutoclave', {
+const AutoclaveBrand = sequelize.define('marca_autoclave', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
     nomeMarca: {
-        type: DataTypes.STRING(45),
+        type: DataTypes.STRING(20),
         allowNull: false,
         unique: true
     },
 }, {
-    tableName: 'marcaAutoclave',
+    tableName: 'marca_autoclave',
     timestamps: true
 });
-
-AutoclaveBrand.sync();
 
 module.exports = AutoclaveBrand;

@@ -1,8 +1,8 @@
-const Brand = require('../schemas/schemaWasherBrand');
+const WasherBrand = require('../schemas/schemaWasherBrand');
 
 const getWasherBrands = async (req, res) => {
     try {
-        const brands = await Brand.findAll();
+        const brands = await WasherBrand.findAll();
         res.status(200).json(brands);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -12,7 +12,7 @@ const getWasherBrands = async (req, res) => {
 const getOneWasherBrand = async (req, res) => {
     const id = req.params.id;
     try {
-        const brand = await Brand.findByPk(id);
+        const brand = await WasherBrand.findByPk(id);
         if (brand) {
             res.status(200).json(brand);
         } else {
@@ -32,14 +32,14 @@ const createOneWasherBrand = async (req, res) => {
             return res.status(400).json({ message: 'Marca ou equipamento não fornecidos. Por favor preencha todos os campos!' });
         }
 
-        const existingBrand = await Brand.findOne({ where: { nomeMarca } });
+        const existingBrand = await WasherBrand.findOne({ where: { nomeMarca } });
 
         if (existingBrand) {
             return res.status(409).json({ message: 'A Marca já foi cadastrada.' });
         }
 
         if (Object.keys(brand).length > 0) {
-            const newBrand = await Brand.create(brand);
+            const newBrand = await WasherBrand.create(brand);
             res.status(201).json(newBrand);
         } else {
             res.status(406).json({ message: 'Ops, não foi possível adicionar essa marca!' });
@@ -52,7 +52,7 @@ const createOneWasherBrand = async (req, res) => {
 const updateOneWasherBrand = async (req, res) => {
     try {
         const id = req.params.id;
-        const brand = await Brand.findByPk(id);
+        const brand = await WasherBrand.findByPk(id);
 
         if (!brand) {
             return res.status(404).send('Marca não encontrada!');
@@ -61,7 +61,7 @@ const updateOneWasherBrand = async (req, res) => {
         const brandName = req.body;
         const { nomeMarca } = brandName;
 
-        const existingBrand = await Brand.findOne({ where: { nomeMarca } });
+        const existingBrand = await WasherBrand.findOne({ where: { nomeMarca } });
 
         if (existingBrand && existingBrand.id !== parseInt(id)) {
             return res.status(409).json({ message: 'Marca já cadastrada no banco de dados.' });
@@ -71,7 +71,7 @@ const updateOneWasherBrand = async (req, res) => {
             return res.status(400).json({ message: 'Marca ou equipamento não fornecidos. Por favor preencha todos os campos!' });
         }
 
-        const [updatedBrand] = await Brand.update(brandName, {
+        const [updatedBrand] = await WasherBrand.update(brandName, {
             where: { id }
         });
 
@@ -88,7 +88,7 @@ const updateOneWasherBrand = async (req, res) => {
 const deleteOneWasherBrand = async (req, res) => {
     const id = req.params.id;
     try {
-        const deletedBrand = await Brand.findByPk(id);
+        const deletedBrand = await WasherBrand.findByPk(id);
         if (deletedBrand) {
             await deletedBrand.destroy();
             res.status(200).send('Marca removida com sucesso!');

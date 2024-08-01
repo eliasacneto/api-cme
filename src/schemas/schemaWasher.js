@@ -21,61 +21,53 @@ const Washer = sequelize.define('lavadora', {
         allowNull: false,
         unique: true
     },
-    volumeTotalCamaraLt: {
+    volumeTotalCamaraLt: {//270
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    capacidadeCargaBandejasInstrumentos: {
+    capacidadeCargaBandejasInstrumentos: {//10
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    capacidadeCargaTraqueias: {
+    capacidadeCargaTraqueias: {//18
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    tempMedCicloInstrumentosCargaMaxMin: {
+    tempMedCicloInstrumentosCargaMaxMin: {//60
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    tempMedCicloAssisVentCargaMaxMin: {
+    tempMedCicloAssisVentCargaMaxMin: { //60
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    numBandejasPorUe: {
+    numBandejasPorUe: {//2
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    capacidadeProcessamUeCargaInstrumentos: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-        defaultValue: 0.0
-    },
-    intervaloMedEntreCiclos: {
+    intervaloMedEntreCiclos: { //10
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    qtdTraqueiasCirurgia: {
+    qtdTraqueiasCirurgia: {//3
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    qtdTraqueiasLeitoUtiDia: {
+    qtdTraqueiasLeitoUtiDia: { //3
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    quantidadeTermosProjeto: { 
+    quantidadeTermosProjeto: { //2
         type: DataTypes.INTEGER, 
         allowNull: false
     },
     preco: {
-        type: DataTypes.FLOAT, // se for faixa de preço mudar para string
-        allowNull: true,
-        defaultValue: 0.0
+        type: DataTypes.STRING(45),
+        allowNull: false
     },
 }, {
     tableName: 'lavadora',
     timestamps: true,
 });
-
-Washer.sync();
 
 module.exports = Washer;

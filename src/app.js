@@ -6,14 +6,17 @@ const cors = require('cors')
 
 require('dotenv').config();
 const conn = require('./database/conn');
-conn();
+const updateDatabase = require("./utils/updateDatabase.js");
 
-const autoclaveBrandRoute = require('./routes/autoclaveBrandRoute')
+conn();
+updateDatabase();
+
+const autoclaveBrandRoute = require('./routes/autoclaveBrandRoute.js')
 const washerBrandRoute = require('./routes/washerBrandRoute')
 const autoclaveRoute = require('./routes/autoclaveModelRoute')
 const leadRoute = require('./routes/leadRoute')
 const washerRoute = require('./routes/washerModelRoute')
-const recommentadionRoute = require('./routes/recommendationRoute')
+const recommentadionRoute = require('./routes/recommendationRoute.js')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cors())
@@ -28,6 +31,6 @@ app.use('/washerBrand', washerBrandRoute)
 app.use('/autoclaveModel', autoclaveRoute)
 app.use('/lead', leadRoute)
 app.use('/washerModel', washerRoute)
-app.use('/recomendation', recommentadionRoute)
+app.use('/recommendation', recommentadionRoute)
 
 module.exports = app;

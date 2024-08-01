@@ -21,74 +21,70 @@ const Autoclave = sequelize.define('autoclave', {
         allowNull: false,
         unique: true
     },
-    volumeTotCamaraLt: {
+    volumeTotCamaraLt: { //102
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    volumeUtilCamaraLt: {
+    volumeUtilCamaraLt: { //81
+        type: DataTypes.FLOAT,
+        allowNull: false
+    },
+    medTotTempoCicloATMin: { //50
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    medTotTempoCicloATMin: {
+    tempoCargaDescargaMin: { //10
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    tempoCargaDescargaMin: {
+    tempoTestDiarioBDMin: {//30
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    tempoClicloCarDescMin: {
+    tempoDiarioAquecimentoMaqMin: {//20
         type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    preco: {
+        type: DataTypes.STRING(45), // se for faixa de preço mudar para string
         allowNull: true,
         defaultValue: 0
-    },
-    tempoTestDiarioBDMin: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    tempoDiarioAquecimentoMaqMin: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    tempoDisponivelDiarioMin: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        defaultValue: 0
-    },
-    numMaxCiclosDia: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-        defaultValue: 0.0
-    },
-    aproveitamentoCamaraPorcent: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-        defaultValue: 0.0
     },
     numAutoclaves: { 
         type: DataTypes.INTEGER,
         allowNull: true,
         defaultValue: 0
     },
-    numAutoclavesUmaEmManutencao: {
+    tempoClicloCarDescMin: { //60 CALCULADO EM AUTOCLAVECALC
         type: DataTypes.INTEGER,
         allowNull: true,
         defaultValue: 0
     },
-    preco: {
-        type: DataTypes.FLOAT, // se for faixa de preço mudar para string
+    numAutoclavesUmaEmManutencao: { // 2 CALCULADO EM AUTOCLAVECALC
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0
+    },
+    tempoDisponivelDiarioMin: { // CALCULADO EM AUTOCLAVECALC
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0
+    },
+    numMaxCiclosDia: { // CALCULADO EM AUTOCLAVECALC
+        type: DataTypes.FLOAT,
         allowNull: true,
         defaultValue: 0.0
     },
-
+    aproveitamentoCamaraPorcent: { // 79 CALCULADO EM AUTOCLAVECALC
+        type: DataTypes.FLOAT,
+        allowNull: false
+    },
 }, {
     tableName: 'autoclave',
     timestamps: true,
 });
 
 AutoclaveBrand.hasMany(Autoclave, { foreignKey: 'marcaAutoclave' });
-Autoclave.belongsTo(AutoclaveBrand, { foreignKey: 'marcaAutoclave', as: 'brand' });
-
-Autoclave.sync();
+Autoclave.belongsTo(AutoclaveBrand, { foreignKey: 'marcaAutoclave', as: 'brand' }); //ver esse brand com Elias
 
 module.exports = Autoclave;

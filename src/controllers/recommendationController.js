@@ -1,11 +1,11 @@
-const { autoclaveRecommendationByLead } = require('../utils/autoclaveCalc');
-const { washersRecommendationByLead } = require('../utils/washerCalc');
-const { calculoVolumeTotalDiarioPorLead } = require('../utils/calculadora');
+//const { autoclaveRecommendationByLead } = require('../utils/autoclaveCalc');
+//const { washersRecommendationByLead } = require('../utils/washerCalc');
+const { calculoVolumeTotalDiario } = require('../utils/calculadora');
 
 const getCalculation = async (req, res) => {
     const { id } = req.params;
     try {
-        const recommendations = await calculoVolumeTotalDiarioPorLead(id);
+        const recommendations = await calculoVolumeTotalDiario(id);
         res.json(recommendations);
     } catch (error) {
         console.error("Erro ao obter as recomendações:", error);
@@ -13,7 +13,7 @@ const getCalculation = async (req, res) => {
     }
 };
 
-const getRecommendationAutoclave = async (req, res) => {
+/*const getRecommendationAutoclave = async (req, res) => {
     const { id } = req.params;
     try {
         const recommendations = await autoclaveRecommendationByLead(id);
@@ -33,6 +33,7 @@ const getRecommendationWasher = async (req, res) => {
         console.error("Erro ao obter as recomendações:", error);
         res.status(500).json({ error: 'Erro ao obter as recomendações' });
     }
-};
+};*/
 
-module.exports = { getCalculation, getRecommendationAutoclave, getRecommendationWasher };
+//module.exports = { getCalculation, getRecommendationAutoclave, getRecommendationWasher };
+module.exports = { getCalculation };

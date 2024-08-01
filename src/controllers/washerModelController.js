@@ -1,7 +1,6 @@
-
 const Washer = require('../schemas/schemaWasher');
 
-const getWasherModels = async (req, res) => {
+const getWasherModels = async (_, res) => {
     try {
         const washerModels = await Washer.findAll();
         res.status(200).send(washerModels);
@@ -113,15 +112,15 @@ const updateOneWasherModel = async (req, res) => {
         }
 
         const modelWasher = req.body;
-        const { modeloWasher } = modelWasher;
+        const { modeloLavadora } = modelWasher;
 
-        const existingModel = await Washer.findOne({ where: { modeloWasher } });
+        const existingModel = await Washer.findOne({ where: { modeloLavadora } });
 
         if (existingModel && existingModel.id !== parseInt(id)) {
             return res.status(409).json({ message: 'Modelo já cadastrado no banco de dados.' });
         }
 
-        if (!modeloWasher) {
+        if (!modeloLavadora) {
             return res.status(400).json({ message: 'Modelo da lavadora não fornecido.' });
         }
 
