@@ -3,90 +3,74 @@
 </p> -->
 
 <h1 align="center">
-  Projeto: Api-cme
+  API CME
 </h1>
 
 <p style="text-align:center">
   
-  <img src="http://img.shields.io/static/v1?label=STATUS%20DO%20PROJETO:&message=CONCLUIDO&color=GREEN&style=for-the-badge"/>
+  <img src="http://img.shields.io/static/v1?label=PROJECT%20STATUS:&message=FINISHED&color=GREEN&style=for-the-badge"/>
 </p>
 
-## 👨🏻‍💻 Sobre
+## 👨🏻‍💻 About
 
-Este projeto abrange uma API que captura dados de formulários no frontend, realiza cálculos baseados nesses inputs <br>
-e envia recomendações de volta ao usuário. Além disso, inclui uma dashboard no backend com login seguro para <br>
-a empresa, oferecendo funcionalidades avançadas de gerenciamento de leads e equipamentos. <br>
-O projeto foi desenvolvido pelos alunos do curso TECH da [Escola DNC](https://www.escoladnc.com.br/).
+This project includes an API that captures form data from the frontend, performs calculations based on these inputs, and sends recommendations back to the user. Additionally, it features a backend dashboard with secure login for the company, offering advanced lead and equipment management functionalities.
 
+Check the Landing page to collect informantion repository by [clicking here](https://github.com/eliasacneto/web-cme)
+Check the Manager Portal repository by [clicking here](https://github.com/eliasacneto/web-admin-cme)
 
-### Tecnologias utilizadas
+### Technologies Used
 
-- Node: Framework de JavaScript para desenvolvimento de aplicações do lado do servidor.
-- Express: Framework de Node.js para construção de APIs e roteamento de aplicações web.
-- MySQL: Sistema de gerenciamento de banco de dados relacional.
-- Sequelize: ORM (Object-Relational Mapping) para Node.js, compatível com diversos bancos <br>
-de dados relacionais, facilitando a interação e manipulação dos dados.
+- Node.js: JavaScript runtime for server-side application development;
+- Express: Node.js framework for building APIs and routing web applications;
+- MySQL: Relational database management system;
+- Sequelize: ORM (Object-Relational Mapping) for Node.js, compatible with various relational databases, facilitating data interaction and manipulation.
 
-## 💻 Funcionalidades
+## 💻 Features
 
-- Captura de dados de formulário:<br>
-    - Recebe input do usuário através de um formulário no frontend.<br>
-- Processamento de dados:<br>
-    - Executa cálculos ou análises com base nos dados recebidos.<br>
-- Envio de recomendações:<br>
-    - Retorna recomendações ou respostas personalizadas para o usuário no frontend.<br>
-- Dashboard no Backend:<br>
-    - Login seguro: Acesso restrito por login e senha para administradores da empresa.<br>
-    - Gestão de Leads:<br>
-      - Visualização de leads cadastrados no site.<br>
-      - Edição e exclusão de leads existentes.<br>
-      - Inserção manual de novos leads.<br>
-    - Gestão de Equipamentos:<br>
-      - CRUD (Create, Read, Update, Delete) para os dois tipos de equipamentos que a empresa comercializa.<br>
-      - Capacidade de criar novos equipamentos e modificar os existentes.<br>
-    - Registro de Recomendações:<br>
-      - Acesso às recomendações entregues aos usuários, permitindo revisão e análise das interações.<br>
+- Form Data Capture:
+Receives user input through a frontend form.
+- Data Processing:
+Executes calculations or analyses based on received data.
+- Recommendation Delivery:
+Returns personalized recommendations or responses to the user on the frontend.
+- Backend Dashboard:
+Secure Login: Restricted access via login credentials for company administrators.
+- Lead Management:
+View leads registered on the site.
+Edit and delete existing leads.
+Manually add new leads.
+- Equipment Management:
+CRUD (Create, Read, Update, Delete) operations for the types of equipment sold by the company.
+Ability to create new equipment and modify existing ones.
+- Recommendation Records:
+Access to recommendations delivered to users, allowing for review and analysis of interactions.
 
-## ⚙️ Como executar a aplicação:
+## ⚙️ How to Run the Application
 
-Você precisará ter instalado o [Node.js](https://nodejs.org/en) para utilizar comandos npm e o [Git](https://git-scm.com/) instalado na sua máquina.
+You will need [Node.js](https://nodejs.org/en) installed to use npm commands and [Git](https://git-scm.com/) installed on your machine.
 
-Clone o projeto:
+Clone the project:
 
 ```bash
   git clone https://github.com/eliasacneto/api-cme.git
 ```
 
-Navegue até o diretório do projeto:
+Navigate to the project directory:
 
 ```bash
   cd api-cme
 ```
 
-Instale as dependências:
+Install the dependencies:
 
 ```bash
   npm install
 ```
 
-Inicie o servidor:
+Start the server:
 
 ```bash
   npm start
 ```
 
-## :octocat: Contribuidores:
 
-
-<a title="Elias Neto" href="https://github.com/eliasacneto">
-  <img src="https://avatars.githubusercontent.com/u/8580665?v=4" width="100" style="border-radius:50%">
-</a>
-<a title="Renan Mota" href="https://github.com/Rhanoi">
-  <img src="https://avatars.githubusercontent.com/u/101286268?v=4" width="100" style="border-radius:50%">
-</a>
-<a title="Sthery Alves" href="https://github.com/stheryalves">
-  <img src="https://avatars.githubusercontent.com/u/134507985?v=4" width="100" style="border-radius:50%">
-</a>
-<a title="Thiago Morais" href="https://github.com/thiagomorais16">
-  <img src="https://avatars.githubusercontent.com/u/118579263?v=4" width="100" style="border-radius:50%">
-</a>
