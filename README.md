@@ -15,8 +15,8 @@
 
 This project includes an API that captures form data from the frontend, performs calculations based on these inputs, and sends recommendations back to the user. Additionally, it features a backend dashboard with secure login for the company, offering advanced lead and equipment management functionalities.
 
-Check the Landing page to collect informantion repository by [clicking here](https://github.com/eliasacneto/web-cme) <br/>
-Check the Manager Portal repository by [clicking here](https://github.com/eliasacneto/web-admin-cme)
+→ Check the API repository [clicking here](https://github.com/eliasacneto/api-cme)<br/>Check the Landing page to collect informantion repository by [clicking here](https://github.com/eliasacneto/web-cme) <br/>
+→ Check the API repository [clicking here](https://github.com/eliasacneto/api-cme)<br/>Check the Manager Portal repository by [clicking here](https://github.com/eliasacneto/web-admin-cme)
 
 ### Technologies Used
 
